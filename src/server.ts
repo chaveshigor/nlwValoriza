@@ -1,15 +1,27 @@
-import 'reflect-metadata'
-import express from "express"
-import './database'
+import "reflect-metadata"
+import express, { Request, Response, NextFunction } from "express"
+import "express-async-errors"
+import { router } from "./routes"
+import "./database"
 
 const app = express()
 
-app.get('/', (req, res) => {
-    return res.status(200).send({hello: 'world'})
-})
+app.use(express.json())
+app.use(router)
 
-app.post('/', (req, res) => {
-    return res.status(200).send({hello: 'world'})
+// Error midleware
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if(err instanceof Error) {
+        return res.status(400).json({
+            status: "error",
+            description: err.message
+        })
+    }
+
+    return res.status(500).json({
+        status: "error",
+        description: "Unexpected error"
+    })
 })
 
 const port = process.env.APLICATION_PORT || 8080
