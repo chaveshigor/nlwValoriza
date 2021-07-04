@@ -1,6 +1,7 @@
 import { getCustomRepository } from "typeorm"
 import { UserRepositories } from "../repositories/UserRepositories"
-import { ErrorHandler } from '../services/HandlingErrors'
+import { ErrorHandler } from "../services/HandlingErrors"
+import { hash } from "bcryptjs"
 
 interface IUserRequest {
     name: string,
@@ -15,31 +16,30 @@ class CreateUserService {
         const usersRepository = getCustomRepository(UserRepositories)
 
         if(!email) {
-            throw new ErrorHandler("An email must be provided", 402)
-            //throw new Error("Email incorrect")
+            throw new ErrorHandler("An email must be provided", 400)
         }
 
         if(!password) {
-            throw new ErrorHandler("A password must be provided", 402)
-            //throw new Error("Email incorrect")
+            throw new ErrorHandler("A password must be provided", 400)
         }
 
         const userAlreadyExist = await usersRepository.findOne({email})
         
         if (userAlreadyExist) {
-            throw new ErrorHandler("User already exists", 404)
-            //throw new Error("User already exists")
+            throw new ErrorHandler("User already exists", 400)
         }
+
+        const passwordHash = await hash(password, 8)
 
         const user = usersRepository.create({
             name,
             email,
-            password,
+            password: passwordHash,
             admin
         })
 
         await usersRepository.save(user)
-        
+        delete user.password        
         return user
     }
 }
