@@ -14,8 +14,10 @@ class CreateTagService {
             throw new Error("A name must be provided")
         }
 
-        if(name.length === 0) {
-            throw new Error("The name length must be grater than zero")
+        const tagAlreadyExist = await tagRepository.findOne({name})
+
+        if(tagAlreadyExist) {
+            throw new Error("Tag alreary exists")
         }
 
         const newTag = tagRepository.create({
