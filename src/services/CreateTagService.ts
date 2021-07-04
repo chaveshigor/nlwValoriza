@@ -1,5 +1,6 @@
 import { getCustomRepository } from "typeorm"
 import { TagRepositories } from "../repositories/TagRepositories"
+import { ErrorHandler } from '../services/HandlingErrors'
 
 interface ITagRequest {
     name: string
@@ -11,13 +12,13 @@ class CreateTagService {
         const tagRepository = getCustomRepository(TagRepositories)
 
         if(!name) {
-            throw new Error("A name must be provided")
+            throw new ErrorHandler("A name must be provided", 400)
         }
 
         const tagAlreadyExist = await tagRepository.findOne({name})
 
         if(tagAlreadyExist) {
-            throw new Error("Tag alreary exists")
+            throw new ErrorHandler("Tag already exists", 400)
         }
 
         const newTag = tagRepository.create({

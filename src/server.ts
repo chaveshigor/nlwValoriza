@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express"
 import "express-async-errors"
 import { router } from "./routes"
 import "./database"
+import { ErrorHandler } from "./services/HandlingErrors"
 
 const app = express()
 
@@ -10,11 +11,11 @@ app.use(express.json())
 app.use(router)
 
 // Error midleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    if(err instanceof Error) {
-        return res.status(400).json({
+app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
+    if(err instanceof ErrorHandler) {
+        return res.status(err.statusCode).json({
             status: "error",
-            description: err.message
+            description: err.description
         })
     }
 
