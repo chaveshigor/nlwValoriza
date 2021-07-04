@@ -7,7 +7,7 @@ class CreateTagController {
         const { name } = req.body
         const createTagService = new CreateTagService()
         const tag = await createTagService.execute({name})
-
+        
         return res.status(200).json(tag)
     }
 }

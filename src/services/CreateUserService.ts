@@ -5,16 +5,22 @@ import { ErrorHandler } from '../services/HandlingErrors'
 interface IUserRequest {
     name: string,
     email: string,
+    password: string,
     admin?: boolean
 }
 
 class CreateUserService {
 
-    async execute({name, email, admin}: IUserRequest) {
+    async execute({name, email, password, admin}: IUserRequest) {
         const usersRepository = getCustomRepository(UserRepositories)
 
         if(!email) {
             throw new ErrorHandler("An email must be provided", 402)
+            //throw new Error("Email incorrect")
+        }
+
+        if(!password) {
+            throw new ErrorHandler("A password must be provided", 402)
             //throw new Error("Email incorrect")
         }
 
@@ -28,6 +34,7 @@ class CreateUserService {
         const user = usersRepository.create({
             name,
             email,
+            password,
             admin
         })
 
