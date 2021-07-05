@@ -27,8 +27,4 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
     })
 })
 
-const port = process.env.APLICATION_PORT || 8080
-
-app.listen(port, () => {
-    console.log(`Server started at port ${port} :)`)
-})
+export { app }
