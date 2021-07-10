@@ -1,17 +1,19 @@
 import request from "supertest"
 import { app } from "../server"
 import { getConnection, createConnection } from "typeorm"
+import { UserRepositories } from "../repositories/UserRepositories"
+import { CreateUserService } from "../services/CreateUserService"
 
-async function createUser() {
-    const response = await request(app).post("/users").send({
-        name: "Higor",
-        email: "higor@gmail.com",
-        password: "123456",
-        admin: true
-    })
-
-    return response
-}
+jest.mock("../repositories/UserRepositories")
+const userRepository = UserRepositories as jest.Mock<UserRepositories>
+//userRepository
+const repo = new userRepository()
+repo.create = jest.fn().mockImplementation(() => {
+    return {
+        name: "higor"
+    }
+})
+userRepository.getMockImplementation
 
 describe("User features tests", () => {
 
@@ -30,15 +32,11 @@ describe("User features tests", () => {
     })
     
     it('should create a new user', async() => {
-        const res = await createUser()
-        expect(res.statusCode).toBe(200)
+        
+        const service = new CreateUserService()
+        const newUser = service.execute({name: "higor", email: "higor@gmail.com", password: "123456", admin: true}, repo)
+        
+        expect(newUser).toContain("higor")
     })
 
-    it('should create a user that already exist and expect an error', async() => {
-        const res = await createUser()
-        expect(res.statusCode).toBe(200)
-
-        const res2 = await createUser()
-        expect(res2.statusCode).toBe(400)
-    })
 })
